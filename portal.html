@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Luna Studio Owner Access</title>
+    <meta
+      name="description"
+      content="İşletme sahibi giriş ekranı. Yönetim paneline yalnızca yetkili hesapla erişilir."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-page="portal" class="portal-body">
+    <main class="portal-shell">
+      <section class="portal-card">
+        <div class="portal-copy">
+          <p class="eyebrow">Owner Access</p>
+          <h1>Yönetim paneli yalnızca işletme hesabıyla açılır.</h1>
+          <p class="portal-text">
+            Bu ekran müşteri tarafında görünmez. İşletme sahibi kendi bağlantısı
+            veya alan adı sonundaki özel giriş yoluyla panele ulaşır.
+          </p>
+          <div class="portal-points">
+            <div>
+              <strong>Rol bazlı his</strong>
+              <span>Vitrin ve yönetim ekranı birbirinden ayrılır.</span>
+            </div>
+            <div>
+              <strong>Daha profesyonel sunum</strong>
+              <span>“Herkese açık admin linki” görüntüsü ortadan kalkar.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="portal-form-wrap">
+          <form id="portalForm" class="portal-form">
+            <label>
+              <span>E-posta</span>
+              <input name="email" type="email" placeholder="owner@lunastudio.co" required />
+            </label>
+            <label>
+              <span>Şifre</span>
+              <input name="password" type="password" placeholder="••••••••" required />
+            </label>
+            <button class="button button-primary form-submit" type="submit">Giriş Yap</button>
+            <p id="portalFeedback" class="form-feedback" aria-live="polite"></p>
+          </form>
+
+          <div class="credential-box">
+            <p>Demo hesap</p>
+            <strong>owner@lunastudio.co</strong>
+            <strong>LunaDemo2026</strong>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="./script.js"></script>
+  </body>
+</html>

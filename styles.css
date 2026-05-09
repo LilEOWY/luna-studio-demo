@@ -280,7 +280,8 @@ h3 {
 .ops-panel,
 .feature-card,
 .stat-card,
-.admin-panel {
+.admin-panel,
+.portal-card {
   border: 1px solid var(--line);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
@@ -710,7 +711,7 @@ h3 {
 }
 
 .admin-stats {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   margin-top: 1.6rem;
 }
 
@@ -759,6 +760,12 @@ h3 {
   border: 1px solid rgba(23, 19, 17, 0.12);
 }
 
+.chip-button.is-active {
+  color: #fff8ef;
+  background: var(--deep);
+  border-color: var(--deep);
+}
+
 .chip-button.approve {
   color: var(--ok);
   border-color: rgba(47, 122, 86, 0.22);
@@ -776,6 +783,102 @@ h3 {
 
 .note-list {
   margin-top: 1.2rem;
+}
+
+.toolbar-row {
+  display: flex;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.portal-body {
+  min-height: 100svh;
+  background:
+    linear-gradient(135deg, rgba(23, 19, 17, 0.72), rgba(23, 19, 17, 0.42)),
+    url("./assets/salon-interior.png") center / cover no-repeat;
+}
+
+.portal-shell {
+  display: grid;
+  place-items: center;
+  min-height: 100svh;
+  padding: 1.5rem;
+}
+
+.portal-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+  gap: 1.4rem;
+  width: min(100%, 1080px);
+  padding: 1.4rem;
+  background: rgba(255, 252, 248, 0.86);
+  backdrop-filter: blur(18px);
+}
+
+.portal-copy,
+.portal-form-wrap {
+  padding: 1rem;
+}
+
+.portal-text {
+  max-width: 34rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.portal-points {
+  display: grid;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.portal-points div {
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.portal-points strong {
+  display: block;
+}
+
+.portal-form,
+.portal-form label {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.portal-form-wrap {
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.portal-form input {
+  width: 100%;
+  padding: 0.95rem 1rem;
+  border: 1px solid rgba(23, 19, 17, 0.14);
+  border-radius: 18px;
+  background: var(--surface-strong);
+}
+
+.credential-box {
+  margin-top: 1.2rem;
+  padding: 1rem;
+  border-radius: 18px;
+  background: rgba(23, 19, 17, 0.04);
+}
+
+.credential-box p {
+  margin: 0 0 0.5rem;
+  color: var(--muted);
+  font-size: 0.84rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.credential-box strong {
+  display: block;
+  margin-top: 0.25rem;
 }
 
 .note-item strong {
@@ -820,6 +923,10 @@ h3 {
   }
 
   .admin-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .portal-card {
     grid-template-columns: 1fr;
   }
 
@@ -871,6 +978,10 @@ h3 {
   .button-secondary,
   .header-cta {
     width: 100%;
+  }
+
+  .toolbar-row {
+    flex-direction: column;
   }
 
   .hero-inline-stats {

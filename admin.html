@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Luna Studio Admin | Randevu ve Müşteri Takibi</title>
+    <title>Luna Studio Admin | Operasyon ve CRM Paneli</title>
     <meta
       name="description"
       content="Randevu onayı, müşteri kartları ve günlük salon operasyonları için admin panel demosu."
@@ -30,6 +30,7 @@
           <a href="#overview">Genel durum</a>
           <a href="#pending">Onay bekleyenler</a>
           <a href="#schedule">Gün planı</a>
+          <a href="#team">Ekip ve performans</a>
           <a href="#customers">Müşteri kartları</a>
         </nav>
         <div class="sidebar-note">
@@ -44,10 +45,11 @@
         <section class="admin-top" id="overview">
           <div>
             <p class="eyebrow">Admin panel demo</p>
-            <h1>Randevu kontrolü ve müşteri takibi tek bakışta.</h1>
+            <h1>Randevu, ekip ve müşteri akışı tek operasyon ekranında.</h1>
           </div>
           <div class="admin-top-actions">
             <a class="button button-secondary dark-button" href="./index.html">Siteye dön</a>
+            <button id="logoutButton" class="button button-secondary dark-button" type="button">Çıkış yap</button>
           </div>
         </section>
 
@@ -72,6 +74,16 @@
             <strong id="adminRevenue">0 TL</strong>
             <small>demo hesaplama</small>
           </article>
+          <article class="stat-card">
+            <span>Doluluk oranı</span>
+            <strong id="adminOccupancy">0%</strong>
+            <small>gün içi kapasite</small>
+          </article>
+          <article class="stat-card">
+            <span>No-show riski</span>
+            <strong id="adminRiskCount">0</strong>
+            <small>yakın takip gereken</small>
+          </article>
         </section>
 
         <section class="admin-grid">
@@ -94,7 +106,36 @@
               </div>
               <span class="mini-note">Onaylı ağırlıklı</span>
             </div>
+            <div class="toolbar-row">
+              <button class="chip-button is-active" type="button">Bugün</button>
+              <button class="chip-button" type="button">Yarın</button>
+              <button class="chip-button" type="button">Bu hafta</button>
+            </div>
             <div id="scheduleList" class="admin-list"></div>
+          </article>
+        </section>
+
+        <section class="admin-grid lower-grid">
+          <article class="admin-panel" id="team">
+            <div class="panel-head">
+              <div>
+                <p>Ekip kontrolü</p>
+                <h3>Uzman performansı</h3>
+              </div>
+              <span class="mini-note">Günlük üretim</span>
+            </div>
+            <div id="teamList" class="admin-list"></div>
+          </article>
+
+          <article class="admin-panel notes-panel">
+            <div class="panel-head">
+              <div>
+                <p>Operasyon notları</p>
+                <h3>Hatırlatmalar</h3>
+              </div>
+              <span class="mini-note">Demo içerik</span>
+            </div>
+            <div id="activityList" class="note-list"></div>
           </article>
         </section>
 
@@ -109,16 +150,15 @@
             </div>
             <div id="customerList" class="customer-grid"></div>
           </article>
-
-          <article class="admin-panel notes-panel">
+          <article class="admin-panel">
             <div class="panel-head">
               <div>
-                <p>Operasyon notları</p>
-                <h3>Günlük kontrol</h3>
+                <p>Hizmet analizi</p>
+                <h3>İşlem dağılımı</h3>
               </div>
-              <span class="mini-note">Demo içerik</span>
+              <span class="mini-note">Satış görünümü</span>
             </div>
-            <div id="activityList" class="note-list"></div>
+            <div id="serviceInsights" class="note-list"></div>
           </article>
         </section>
       </main>

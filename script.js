@@ -1,4 +1,9 @@
 const STORAGE_KEY = "luna-studio-demo-state-v1";
+const AUTH_KEY = "luna-studio-demo-auth-v1";
+const demoCredentials = {
+  email: "owner@lunastudio.co",
+  password: "LunaDemo2026",
+};
 
 const seedState = {
   appointments: [
@@ -100,6 +105,32 @@ const seedState = {
       detail: "Melis'in 17:00 sonrası boya blokları dolu görünüyor.",
     },
   ],
+  staff: [
+    {
+      name: "Melis",
+      role: "Color Specialist",
+      occupancy: 92,
+      revenue: 12600,
+      rating: 4.9,
+      nextSlot: "17:30",
+    },
+    {
+      name: "Derya",
+      role: "Cut & Styling",
+      occupancy: 74,
+      revenue: 7800,
+      rating: 4.8,
+      nextSlot: "15:00",
+    },
+    {
+      name: "Selin",
+      role: "Care Treatments",
+      occupancy: 61,
+      revenue: 5100,
+      rating: 4.7,
+      nextSlot: "14:30",
+    },
+  ],
 };
 
 function loadState() {
@@ -119,6 +150,14 @@ function loadState() {
 
 function saveState(state) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function isAuthenticated() {
+  return localStorage.getItem(AUTH_KEY) === "true";
+}
+
+function setAuthenticated(value) {
+  localStorage.setItem(AUTH_KEY, value ? "true" : "false");
 }
 
 function formatDate(dateString) {
@@ -302,6 +341,11 @@ function renderMarketingPage(state) {
 }
 
 function renderAdminPage(state) {
+  if (!isAuthenticated()) {
+    window.location.href = "./portal.html";
+    return;
+  }
+
   const pending = state.appointments.filter((item) => item.status === "pending");
   const schedule = getTodayAppointments(state);
   const returningCount = state.customers.filter((customer) => customer.visits > 1).length;
@@ -311,16 +355,25 @@ function renderAdminPage(state) {
   const revenue = state.appointments
     .filter((item) => item.status === "confirmed")
     .reduce((sum, item) => sum + servicePrice(item.service), 0);
+  const occupancy = Math.round(
+    state.staff.reduce((sum, person) => sum + person.occupancy, 0) / state.staff.length
+  );
+  const riskCount = state.customers.filter((customer) => customer.loyalty === "geri kazanım").length;
+  const serviceSummary = summarizeServices(state.appointments);
 
   setText("#adminTodayBookings", String(state.appointments.length));
   setText("#adminPendingCount", String(pending.length));
   setText("#adminReturningRate", `%${returningRate}`);
   setText("#adminRevenue", formatMoney(revenue));
+  setText("#adminOccupancy", `%${occupancy}`);
+  setText("#adminRiskCount", String(riskCount));
 
   const pendingList = document.querySelector("#pendingList");
   const scheduleList = document.querySelector("#scheduleList");
   const customerList = document.querySelector("#customerList");
   const activityList = document.querySelector("#activityList");
+  const teamList = document.querySelector("#teamList");
+  const serviceInsights = document.querySelector("#serviceInsights");
 
   if (pendingList) {
     pendingList.innerHTML = pending.length
@@ -394,6 +447,26 @@ function renderAdminPage(state) {
       .join("");
   }
 
+  if (teamList) {
+    teamList.innerHTML = state.staff
+      .map(
+        (person) => `
+          <div class="stack-item">
+            <div class="stack-main">
+              <strong>${person.name}</strong>
+              <span>${person.role}</span>
+              <span>Doluluk %${person.occupancy} • Sıradaki boşluk ${person.nextSlot}</span>
+            </div>
+            <div class="stack-meta">
+              <span class="tag">${formatMoney(person.revenue)}</span>
+              <em>${person.rating} puan</em>
+            </div>
+          </div>
+        `
+      )
+      .join("");
+  }
+
   if (activityList) {
     activityList.innerHTML = state.activity
       .slice(0, 6)
@@ -402,6 +475,19 @@ function renderAdminPage(state) {
           <div class="note-item">
             <strong>${item.title}</strong>
             <span>${item.detail}</span>
+          </div>
+        `
+      )
+      .join("");
+  }
+
+  if (serviceInsights) {
+    serviceInsights.innerHTML = serviceSummary
+      .map(
+        (item) => `
+          <div class="note-item">
+            <strong>${item.service}</strong>
+            <span>${item.count} talep • ${formatMoney(item.revenue)} potansiyel ciro</span>
           </div>
         `
       )
@@ -451,6 +537,62 @@ function renderAdminPage(state) {
     saveState(state);
     renderAdminPage(state);
   }, { once: true });
+
+  const logoutButton = document.querySelector("#logoutButton");
+  if (logoutButton && logoutButton.dataset.bound !== "true") {
+    logoutButton.dataset.bound = "true";
+    logoutButton.addEventListener("click", () => {
+      setAuthenticated(false);
+      window.location.href = "./portal.html";
+    });
+  }
+}
+
+function summarizeServices(appointments) {
+  const totals = new Map();
+
+  appointments.forEach((item) => {
+    const existing = totals.get(item.service) || {
+      service: item.service,
+      count: 0,
+      revenue: 0,
+    };
+    existing.count += 1;
+    existing.revenue += servicePrice(item.service);
+    totals.set(item.service, existing);
+  });
+
+  return [...totals.values()].sort((a, b) => b.count - a.count).slice(0, 4);
+}
+
+function renderPortalPage() {
+  if (isAuthenticated()) {
+    window.location.href = "./admin.html";
+    return;
+  }
+
+  const portalForm = document.querySelector("#portalForm");
+  const feedback = document.querySelector("#portalFeedback");
+  if (!portalForm || portalForm.dataset.bound === "true") return;
+
+  portalForm.dataset.bound = "true";
+  portalForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const formData = new FormData(portalForm);
+    const email = formData.get("email")?.toString().trim().toLowerCase();
+    const password = formData.get("password")?.toString().trim();
+
+    if (email === demoCredentials.email && password === demoCredentials.password) {
+      setAuthenticated(true);
+      window.location.href = "./admin.html";
+      return;
+    }
+
+    if (feedback) {
+      feedback.textContent = "Giriş bilgileri eşleşmedi. Demo hesapla yeniden deneyin.";
+      feedback.style.color = "var(--danger)";
+    }
+  });
 }
 
 function setText(selector, text) {
@@ -486,6 +628,10 @@ if (page === "marketing") {
 
 if (page === "admin") {
   renderAdminPage(state);
+}
+
+if (page === "portal") {
+  renderPortalPage();
 }
 
 setupRevealAnimation();
