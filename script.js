@@ -67,34 +67,49 @@ const seedState = {
       id: "cus-1",
       name: "Ece Demir",
       phone: "0553 440 10 22",
+      email: "ece@demo.com",
       favoriteService: "Renk + bakım",
       lastVisit: "2026-04-22",
       visits: 6,
       spend: 18250,
       note: "Ton koruma ürünü önerisine sıcak.",
       loyalty: "yüksek",
+      vipPoints: 860,
+      vipTier: "Gold",
+      referrals: 3,
+      rewardProgress: 140,
     },
     {
       id: "cus-2",
       name: "Selin Akın",
       phone: "0554 221 44 10",
+      email: "selin@demo.com",
       favoriteService: "Kesim + fön",
       lastVisit: "2026-05-01",
       visits: 3,
       spend: 7200,
       note: "Cuma öğlen saatlerini tercih ediyor.",
       loyalty: "orta",
+      vipPoints: 340,
+      vipTier: "Silver",
+      referrals: 1,
+      rewardProgress: 60,
     },
     {
       id: "cus-3",
       name: "Derya Öztürk",
       phone: "0541 555 91 30",
+      email: "derya@demo.com",
       favoriteService: "Bakım paketi",
       lastVisit: "2026-03-28",
       visits: 2,
       spend: 5100,
       note: "Uzun süredir geri çağrı yapılmamış.",
       loyalty: "geri kazanım",
+      vipPoints: 180,
+      vipTier: "Bronze",
+      referrals: 0,
+      rewardProgress: 20,
     },
   ],
   activity: [
@@ -215,6 +230,7 @@ function upsertCustomerFromAppointment(state, appointment) {
   if (existing) {
     existing.favoriteService = appointment.service;
     existing.note = appointment.notes || existing.note;
+    existing.rewardProgress = Math.min((existing.rewardProgress || 0) + 20, 200);
     return;
   }
 
@@ -228,7 +244,18 @@ function upsertCustomerFromAppointment(state, appointment) {
     spend: servicePrice(appointment.service),
     note: appointment.notes || "Yeni müşteri adayı.",
     loyalty: "yeni",
+    vipPoints: 80,
+    vipTier: "Bronze",
+    referrals: 0,
+    rewardProgress: 20,
   });
+}
+
+function tierFromPoints(points) {
+  if (points >= 900) return "Platinum";
+  if (points >= 600) return "Gold";
+  if (points >= 300) return "Silver";
+  return "Bronze";
 }
 
 function statusLabel(status) {
@@ -317,6 +344,7 @@ function renderMarketingPage(state) {
 
   const bookingForm = document.querySelector("#bookingForm");
   const formFeedback = document.querySelector("#formFeedback");
+  setupBookingCalendar(state);
   if (bookingForm && bookingForm.dataset.bound !== "true") {
     bookingForm.dataset.bound = "true";
     bookingForm.addEventListener("submit", (event) => {
@@ -330,7 +358,10 @@ function renderMarketingPage(state) {
         staff: formData.get("staff")?.toString().trim(),
         date: formData.get("date")?.toString().trim(),
         time: formData.get("time")?.toString().trim(),
+        profile: formData.get("profile")?.toString().trim(),
+        visitType: formData.get("visitType")?.toString().trim(),
         notes: formData.get("notes")?.toString().trim(),
+        expectation: formData.get("expectation")?.toString().trim(),
         status: "pending",
         createdAt: new Date().toISOString(),
       };
@@ -343,6 +374,8 @@ function renderMarketingPage(state) {
       });
       saveState(state);
       bookingForm.reset();
+      const calendarGrid = document.querySelector("#calendarGrid");
+      calendarGrid?._resetBookingCalendar?.();
 
       if (formFeedback) {
         formFeedback.textContent =
@@ -388,6 +421,8 @@ function renderAdminPage(state) {
   const activityList = document.querySelector("#activityList");
   const teamList = document.querySelector("#teamList");
   const serviceInsights = document.querySelector("#serviceInsights");
+  const loyaltyAdminList = document.querySelector("#loyaltyAdminList");
+  const campaignIdeas = document.querySelector("#campaignIdeas");
 
   if (pendingList) {
     pendingList.innerHTML = pending.length
@@ -508,6 +543,46 @@ function renderAdminPage(state) {
       .join("");
   }
 
+  if (loyaltyAdminList) {
+    loyaltyAdminList.innerHTML = state.customers
+      .slice(0, 4)
+      .map(
+        (customer) => `
+          <article class="customer-card">
+            <div class="customer-brief">
+              <strong>${customer.name}</strong>
+              <span class="tag">${customer.vipTier}</span>
+            </div>
+            <p>${customer.vipPoints} puan • ${customer.referrals} davet</p>
+            <div class="customer-meta">
+              <span>Ödül ilerlemesi %${customer.rewardProgress || 0}</span>
+              <span>${customer.loyalty}</span>
+            </div>
+            <span>Bir sonraki ödül: ücretsiz bakım mini paketi</span>
+          </article>
+        `
+      )
+      .join("");
+  }
+
+  if (campaignIdeas) {
+    campaignIdeas.innerHTML = [
+      "Arkadaşını getirene 150 puan + mini bakım hediyesi",
+      "3 işlem sonrası Silver, 6 işlem sonrası Gold seviye",
+      "45 gün gelmeyene VIP dönüş kampanyası gönder",
+      "Yorum bırakan müşteriye puan bonusu tanımla",
+    ]
+      .map(
+        (item) => `
+          <div class="note-item">
+            <strong>Kampanya</strong>
+            <span>${item}</span>
+          </div>
+        `
+      )
+      .join("");
+  }
+
   document.body.addEventListener("click", (event) => {
     const button = event.target.closest("[data-action]");
     if (!button) return;
@@ -540,6 +615,9 @@ function renderAdminPage(state) {
         customer.lastVisit = appointment.date;
         customer.spend += servicePrice(appointment.service);
         customer.loyalty = customer.visits >= 5 ? "yüksek" : "orta";
+        customer.vipPoints += Math.round(servicePrice(appointment.service) / 20);
+        customer.vipTier = tierFromPoints(customer.vipPoints);
+        customer.rewardProgress = Math.min((customer.rewardProgress || 0) + 35, 200);
       }
 
       state.activity.unshift({
@@ -670,12 +748,17 @@ function renderCustomerPage(state) {
     (appointment) => appointment.status === "completed" || appointment.status === "confirmed"
   );
   const favoriteStaff = appointments[0]?.staff || "Melis";
+  const rewardsContainer = document.querySelector("#customerRewards");
+  const referralContainer = document.querySelector("#customerReferral");
 
   setText("#customerNextTime", upcoming ? `${formatDate(upcoming.date)} • ${upcoming.time}` : "Plan yok");
   setText("#customerNextService", upcoming ? upcoming.service : "Yeni rezervasyon öner");
   setText("#customerVisitCount", String(customer.visits));
   setText("#customerFavoriteService", customer.favoriteService || "-");
   setText("#customerFavoriteStaff", favoriteStaff);
+  setText("#customerVipPoints", String(customer.vipPoints || 0));
+  setText("#customerVipTier", `${customer.vipTier || "Bronze"} seviye`);
+  setText("#customerReferralCount", String(customer.referrals || 0));
 
   const upcomingContainer = document.querySelector("#customerUpcoming");
   const historyContainer = document.querySelector("#customerHistory");
@@ -742,6 +825,10 @@ function renderCustomerPage(state) {
         title: "Yorum fırsatı",
         detail: "Son işleminden memnun kaldıysan Google yorum bırakman istenebilir.",
       },
+      {
+        title: "VIP puan fırsatı",
+        detail: "Tekrar rezervasyon ve arkadaş daveti ile daha hızlı ödül açılır.",
+      },
     ]
       .map(
         (item) => `
@@ -772,6 +859,42 @@ function renderCustomerPage(state) {
       .join("");
   }
 
+  if (rewardsContainer) {
+    rewardsContainer.innerHTML = [
+      `Şu an ${customer.vipPoints || 0} VIP puanın var.`,
+      `${customer.vipTier || "Bronze"} seviyedesin; bir üst seviyede öncelikli slot açılır.`,
+      `Ödül ilerlemen %${customer.rewardProgress || 0}. 100%'de ücretsiz bakım hediyesi.`,
+      "Yorum bırakırsan veya arkadaş getirirsen ekstra puan kazanırsın.",
+    ]
+      .map(
+        (item) => `
+          <div class="note-item">
+            <strong>VIP Kulübü</strong>
+            <span>${item}</span>
+          </div>
+        `
+      )
+      .join("");
+  }
+
+  if (referralContainer) {
+    referralContainer.innerHTML = [
+      `Kişisel davet kodun: LUNA-${customer.name.split(" ")[0].toUpperCase()}`,
+      `${customer.referrals || 0} arkadaş sisteme geldi.`,
+      "Her yeni üye için 150 puan ve mini hediye açılır.",
+      "3 başarılı davette özel bakım veya indirim paketi tanımlanır.",
+    ]
+      .map(
+        (item) => `
+          <div class="note-item">
+            <strong>Davet sistemi</strong>
+            <span>${item}</span>
+          </div>
+        `
+      )
+      .join("");
+  }
+
   const logoutButton = document.querySelector("#customerLogoutButton");
   if (logoutButton && logoutButton.dataset.bound !== "true") {
     logoutButton.dataset.bound = "true";
@@ -780,6 +903,145 @@ function renderCustomerPage(state) {
       window.location.href = "./account.html";
     });
   }
+}
+
+function setupBookingCalendar(state) {
+  const calendarGrid = document.querySelector("#calendarGrid");
+  const slotGrid = document.querySelector("#slotGrid");
+  const calendarLabel = document.querySelector("#calendarLabel");
+  const selectedDateInput = document.querySelector("#selectedDateInput");
+  const selectedTimeInput = document.querySelector("#selectedTimeInput");
+  const summary = document.querySelector("#bookingSummary");
+  const prevMonth = document.querySelector("#prevMonth");
+  const nextMonth = document.querySelector("#nextMonth");
+  if (!calendarGrid || !slotGrid || !calendarLabel || !selectedDateInput || !selectedTimeInput) return;
+  if (calendarGrid.dataset.bound === "true") {
+    calendarGrid._refreshBookingCalendar?.();
+    return;
+  }
+  calendarGrid.dataset.bound = "true";
+
+  const viewState = {
+    monthOffset: 0,
+    selectedDate: "",
+    selectedTime: "",
+  };
+
+  const baseDate = new Date("2026-05-01T00:00:00");
+
+  function availableSlots(dateText) {
+    const all = ["09:30", "10:30", "11:30", "13:00", "14:30", "16:00", "17:30", "19:00"];
+    const busy = state.appointments
+      .filter((item) => item.date === dateText && item.status !== "cancelled")
+      .map((item) => item.time);
+    return all.filter((slot) => !busy.includes(slot));
+  }
+
+  function renderSlots() {
+    const slots = viewState.selectedDate ? availableSlots(viewState.selectedDate) : [];
+    slotGrid.innerHTML = slots.length
+      ? slots
+          .map(
+            (slot) => `
+              <button class="slot-button ${viewState.selectedTime === slot ? "is-selected" : ""}" type="button" data-slot="${slot}">
+                <strong>${slot}</strong>
+              </button>
+            `
+          )
+          .join("")
+      : `<div class="note-item"><strong>Önce gün seç</strong><span>Müsait saatler burada görünür.</span></div>`;
+  }
+
+  function renderSummary() {
+    if (!summary) return;
+    summary.textContent =
+      viewState.selectedDate && viewState.selectedTime
+        ? `${formatDate(viewState.selectedDate)} tarihinde ${viewState.selectedTime} için talep oluşturulacak. Bu gün için ${
+            availableSlots(viewState.selectedDate).length
+          } müsait slot var.`
+        : "Tarih ve saat seçildiğinde kısa özet burada görünür.";
+  }
+
+  function renderCalendar() {
+    const current = new Date(baseDate);
+    current.setMonth(baseDate.getMonth() + viewState.monthOffset);
+    const year = current.getFullYear();
+    const month = current.getMonth();
+    calendarLabel.textContent = new Intl.DateTimeFormat("tr-TR", {
+      month: "long",
+      year: "numeric",
+    }).format(current);
+
+    const firstDay = new Date(year, month, 1);
+    const startIndex = (firstDay.getDay() + 6) % 7;
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const cells = [];
+
+    for (let i = 0; i < startIndex; i += 1) {
+      cells.push(`<div class="day-cell is-empty"></div>`);
+    }
+
+    for (let day = 1; day <= daysInMonth; day += 1) {
+      const dateText = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+      const slotCount = availableSlots(dateText).length;
+      cells.push(`
+        <button class="day-cell ${viewState.selectedDate === dateText ? "is-selected" : ""} ${
+          slotCount <= 3 ? "is-busy" : ""
+        }" type="button" data-date="${dateText}">
+          <strong>${day}</strong>
+          <small>${slotCount} slot</small>
+        </button>
+      `);
+    }
+
+    calendarGrid.innerHTML = cells.join("");
+    renderSlots();
+    renderSummary();
+    selectedDateInput.value = viewState.selectedDate;
+    selectedTimeInput.value = viewState.selectedTime;
+  }
+
+  calendarGrid._refreshBookingCalendar = renderCalendar;
+  calendarGrid._resetBookingCalendar = () => {
+    viewState.selectedDate = "";
+    viewState.selectedTime = "";
+    selectedDateInput.value = "";
+    selectedTimeInput.value = "";
+    renderCalendar();
+  };
+
+  calendarGrid.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-date]");
+    if (!button) return;
+    viewState.selectedDate = button.dataset.date || "";
+    viewState.selectedTime = "";
+    renderCalendar();
+  });
+
+  slotGrid.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-slot]");
+    if (!button) return;
+    viewState.selectedTime = button.dataset.slot || "";
+    selectedTimeInput.value = viewState.selectedTime;
+    renderSlots();
+    renderSummary();
+  });
+
+  prevMonth?.addEventListener("click", () => {
+    viewState.monthOffset -= 1;
+    viewState.selectedDate = "";
+    viewState.selectedTime = "";
+    renderCalendar();
+  });
+
+  nextMonth?.addEventListener("click", () => {
+    viewState.monthOffset += 1;
+    viewState.selectedDate = "";
+    viewState.selectedTime = "";
+    renderCalendar();
+  });
+
+  renderCalendar();
 }
 
 function setText(selector, text) {

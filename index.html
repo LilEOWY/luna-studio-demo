@@ -189,6 +189,38 @@
 
           <div class="booking-card reveal delay-1">
             <form id="bookingForm" class="booking-form">
+              <div class="calendar-wrap">
+                <div class="calendar-head">
+                  <div>
+                    <p class="eyebrow">Randevu takvimi</p>
+                    <h3>Uygun günleri gör</h3>
+                  </div>
+                  <div class="calendar-nav">
+                    <button id="prevMonth" class="chip-button" type="button">Geri</button>
+                    <button id="nextMonth" class="chip-button" type="button">İleri</button>
+                  </div>
+                </div>
+                <div id="calendarLabel" class="calendar-label"></div>
+                <div class="calendar-weekdays">
+                  <span>Pzt</span>
+                  <span>Sal</span>
+                  <span>Çar</span>
+                  <span>Per</span>
+                  <span>Cum</span>
+                  <span>Cmt</span>
+                  <span>Paz</span>
+                </div>
+                <div id="calendarGrid" class="calendar-grid"></div>
+              </div>
+              <div class="slot-wrap">
+                <div class="calendar-head">
+                  <div>
+                    <p class="eyebrow">Saat seçimi</p>
+                    <h3>Müsait slotlar</h3>
+                  </div>
+                </div>
+                <div id="slotGrid" class="slot-grid"></div>
+              </div>
               <div class="form-grid">
                 <label>
                   <span>Ad soyad</span>
@@ -218,12 +250,28 @@
                   </select>
                 </label>
                 <label>
-                  <span>Tarih</span>
-                  <input name="date" type="date" required />
+                  <span>Seçilen tarih</span>
+                  <input id="selectedDateInput" name="date" type="text" readonly required />
                 </label>
                 <label>
-                  <span>Saat</span>
-                  <input name="time" type="time" required />
+                  <span>Seçilen saat</span>
+                  <input id="selectedTimeInput" name="time" type="text" readonly required />
+                </label>
+                <label>
+                  <span>Saç tipi / ihtiyaç</span>
+                  <select name="profile">
+                    <option>Düz / normal</option>
+                    <option>Yoğun işlem görmüş</option>
+                    <option>Kıvırcık / dalgalı</option>
+                    <option>Hassas saç derisi</option>
+                  </select>
+                </label>
+                <label>
+                  <span>Ziyaret tipi</span>
+                  <select name="visitType">
+                    <option>İlk ziyaret</option>
+                    <option>Tekrar ziyaret</option>
+                  </select>
                 </label>
               </div>
               <label>
@@ -234,6 +282,17 @@
                   placeholder="Örn. Daha önce sombre yaptırdım, doğal ton istiyorum."
                 ></textarea>
               </label>
+              <label>
+                <span>Beklenti / referans detayı</span>
+                <textarea
+                  name="expectation"
+                  rows="3"
+                  placeholder="Örn. Küllü değil daha sıcak ton, katlı kesim istiyorum."
+                ></textarea>
+              </label>
+              <div class="booking-summary" id="bookingSummary">
+                Tarih ve saat seçildiğinde kısa özet burada görünür.
+              </div>
               <button class="button button-primary form-submit" type="submit">
                 Randevu Talebi Oluştur
               </button>
