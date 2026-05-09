@@ -1,8 +1,14 @@
 const STORAGE_KEY = "luna-studio-demo-state-v1";
 const AUTH_KEY = "luna-studio-demo-auth-v1";
+const CUSTOMER_AUTH_KEY = "luna-studio-demo-customer-auth-v1";
 const demoCredentials = {
   email: "owner@lunastudio.co",
   password: "LunaDemo2026",
+};
+const customerCredentials = {
+  email: "ece@demo.com",
+  password: "LunaClient2026",
+  phone: "0553 440 10 22",
 };
 
 const seedState = {
@@ -158,6 +164,14 @@ function isAuthenticated() {
 
 function setAuthenticated(value) {
   localStorage.setItem(AUTH_KEY, value ? "true" : "false");
+}
+
+function isCustomerAuthenticated() {
+  return localStorage.getItem(CUSTOMER_AUTH_KEY) === "true";
+}
+
+function setCustomerAuthenticated(value) {
+  localStorage.setItem(CUSTOMER_AUTH_KEY, value ? "true" : "false");
 }
 
 function formatDate(dateString) {
@@ -595,6 +609,179 @@ function renderPortalPage() {
   });
 }
 
+function getCustomerProfile(state) {
+  return (
+    state.customers.find((customer) => customer.phone === customerCredentials.phone) ||
+    state.customers[0] ||
+    null
+  );
+}
+
+function getCustomerAppointments(state, phone) {
+  return state.appointments
+    .filter((appointment) => appointment.phone === phone)
+    .sort((a, b) => `${b.date}T${b.time}`.localeCompare(`${a.date}T${a.time}`));
+}
+
+function renderAccountPage() {
+  if (isCustomerAuthenticated()) {
+    window.location.href = "./customer.html";
+    return;
+  }
+
+  const accountForm = document.querySelector("#accountForm");
+  const feedback = document.querySelector("#accountFeedback");
+  if (!accountForm || accountForm.dataset.bound === "true") return;
+
+  accountForm.dataset.bound = "true";
+  accountForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const formData = new FormData(accountForm);
+    const email = formData.get("email")?.toString().trim().toLowerCase();
+    const password = formData.get("password")?.toString().trim();
+
+    if (email === customerCredentials.email && password === customerCredentials.password) {
+      setCustomerAuthenticated(true);
+      window.location.href = "./customer.html";
+      return;
+    }
+
+    if (feedback) {
+      feedback.textContent = "Giriş bilgileri eşleşmedi. Demo müşteri hesabıyla deneyin.";
+      feedback.style.color = "var(--danger)";
+    }
+  });
+}
+
+function renderCustomerPage(state) {
+  if (!isCustomerAuthenticated()) {
+    window.location.href = "./account.html";
+    return;
+  }
+
+  const customer = getCustomerProfile(state);
+  if (!customer) return;
+
+  const appointments = getCustomerAppointments(state, customer.phone);
+  const upcoming = appointments.find((appointment) =>
+    appointment.status === "confirmed" || appointment.status === "pending"
+  );
+  const history = appointments.filter(
+    (appointment) => appointment.status === "completed" || appointment.status === "confirmed"
+  );
+  const favoriteStaff = appointments[0]?.staff || "Melis";
+
+  setText("#customerNextTime", upcoming ? `${formatDate(upcoming.date)} • ${upcoming.time}` : "Plan yok");
+  setText("#customerNextService", upcoming ? upcoming.service : "Yeni rezervasyon öner");
+  setText("#customerVisitCount", String(customer.visits));
+  setText("#customerFavoriteService", customer.favoriteService || "-");
+  setText("#customerFavoriteStaff", favoriteStaff);
+
+  const upcomingContainer = document.querySelector("#customerUpcoming");
+  const historyContainer = document.querySelector("#customerHistory");
+  const careContainer = document.querySelector("#customerCare");
+  const actionContainer = document.querySelector("#customerActions");
+
+  if (upcomingContainer) {
+    upcomingContainer.innerHTML = upcoming
+      ? `
+        <div class="stack-item">
+          <div class="stack-main">
+            <strong>${upcoming.service}</strong>
+            <span>${formatDate(upcoming.date)} • ${upcoming.time}</span>
+            <span>Uzman: ${upcoming.staff}</span>
+          </div>
+          <div class="action-row">
+            <span class="status-pill ${statusClass(upcoming.status)}">${statusLabel(upcoming.status)}</span>
+            <span class="tag">${customer.phone}</span>
+          </div>
+        </div>
+      `
+      : `
+        <div class="stack-item">
+          <div class="stack-main">
+            <strong>Yaklaşan randevu yok</strong>
+            <span>Yeni rezervasyon için işletmeyle iletişime geçebilirsin.</span>
+          </div>
+        </div>
+      `;
+  }
+
+  if (historyContainer) {
+    historyContainer.innerHTML = history.slice(0, 4)
+      .map(
+        (appointment) => `
+          <article class="customer-card">
+            <div class="customer-brief">
+              <strong>${appointment.service}</strong>
+              <span class="tag">${appointment.staff}</span>
+            </div>
+            <p>${formatDate(appointment.date)} • ${appointment.time}</p>
+            <div class="customer-meta">
+              <span>${statusLabel(appointment.status)}</span>
+              <span>${formatMoney(servicePrice(appointment.service))}</span>
+            </div>
+            <span>${appointment.notes || "Not eklenmedi."}</span>
+          </article>
+        `
+      )
+      .join("");
+  }
+
+  if (careContainer) {
+    careContainer.innerHTML = [
+      {
+        title: "Bakım önerisi",
+        detail: `${customer.favoriteService} sonrası 3-4 hafta içinde kontrol bakımı önerilir.`,
+      },
+      {
+        title: "Favori uzman",
+        detail: `${favoriteStaff} ile benzer saatlerde tekrar rezervasyon daha hızlı tamamlanır.`,
+      },
+      {
+        title: "Yorum fırsatı",
+        detail: "Son işleminden memnun kaldıysan Google yorum bırakman istenebilir.",
+      },
+    ]
+      .map(
+        (item) => `
+          <div class="note-item">
+            <strong>${item.title}</strong>
+            <span>${item.detail}</span>
+          </div>
+        `
+      )
+      .join("");
+  }
+
+  if (actionContainer) {
+    actionContainer.innerHTML = [
+      "Aynı uzmanla tekrar randevu al",
+      "Bakım paketi sor",
+      "İşlem sonrası yorum bırak",
+      "WhatsApp'tan salonla konuş",
+    ]
+      .map(
+        (item) => `
+          <div class="note-item">
+            <strong>${item}</strong>
+            <span>Bu aksiyon müşteri panelinden tek tıkla çalışacak şekilde ürünleştirilebilir.</span>
+          </div>
+        `
+      )
+      .join("");
+  }
+
+  const logoutButton = document.querySelector("#customerLogoutButton");
+  if (logoutButton && logoutButton.dataset.bound !== "true") {
+    logoutButton.dataset.bound = "true";
+    logoutButton.addEventListener("click", () => {
+      setCustomerAuthenticated(false);
+      window.location.href = "./account.html";
+    });
+  }
+}
+
 function setText(selector, text) {
   const element = document.querySelector(selector);
   if (element) element.textContent = text;
@@ -632,6 +819,14 @@ if (page === "admin") {
 
 if (page === "portal") {
   renderPortalPage();
+}
+
+if (page === "account") {
+  renderAccountPage();
+}
+
+if (page === "customer") {
+  renderCustomerPage(state);
 }
 
 setupRevealAnimation();

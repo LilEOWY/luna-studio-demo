@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Luna Studio Client Panel</title>
+    <meta
+      name="description"
+      content="Müşteri paneli demosu. Yaklaşan randevular, işlem geçmişi ve bakım önerileri."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-page="customer" class="admin-body">
+    <div class="admin-shell customer-shell">
+      <aside class="admin-sidebar customer-sidebar">
+        <a class="brand admin-brand" href="./index.html">
+          <span class="brand-mark">LS</span>
+          <span class="brand-copy">
+            <strong>Luna Studio</strong>
+            <small>Müşteri paneli</small>
+          </span>
+        </a>
+        <nav class="admin-nav">
+          <a href="#overview">Genel görünüm</a>
+          <a href="#upcoming">Yaklaşan randevu</a>
+          <a href="#history">Geçmiş işlemler</a>
+          <a href="#care">Bakım önerileri</a>
+        </nav>
+        <div class="sidebar-note">
+          <p>Müşteri değeri</p>
+          <strong>
+            “Randevumu, geçmişimi ve tekrar rezervasyonu tek yerden görüyorum.”
+          </strong>
+        </div>
+      </aside>
+
+      <main class="admin-main">
+        <section class="admin-top" id="overview">
+          <div>
+            <p class="eyebrow">Client dashboard</p>
+            <h1>Randevun, uzman tercihlerin ve geçmiş işlemlerin tek panelde.</h1>
+          </div>
+          <div class="admin-top-actions">
+            <a class="button button-secondary dark-button" href="./index.html">Siteye dön</a>
+            <button id="customerLogoutButton" class="button button-secondary dark-button" type="button">Çıkış yap</button>
+          </div>
+        </section>
+
+        <section class="admin-stats customer-stats">
+          <article class="stat-card">
+            <span>Sıradaki randevu</span>
+            <strong id="customerNextTime">-</strong>
+            <small id="customerNextService">-</small>
+          </article>
+          <article class="stat-card">
+            <span>Toplam ziyaret</span>
+            <strong id="customerVisitCount">0</strong>
+            <small>sadakat seviyesi</small>
+          </article>
+          <article class="stat-card">
+            <span>Favori işlem</span>
+            <strong id="customerFavoriteService">-</strong>
+            <small>en sık tercih</small>
+          </article>
+          <article class="stat-card">
+            <span>Favori uzman</span>
+            <strong id="customerFavoriteStaff">-</strong>
+            <small>son tercihlere göre</small>
+          </article>
+        </section>
+
+        <section class="admin-grid">
+          <article class="admin-panel" id="upcoming">
+            <div class="panel-head">
+              <div>
+                <p>Yaklaşan randevu</p>
+                <h3>Bir sonraki ziyaret</h3>
+              </div>
+              <span class="mini-note">Canlı görünüm</span>
+            </div>
+            <div id="customerUpcoming" class="admin-list"></div>
+          </article>
+
+          <article class="admin-panel" id="care">
+            <div class="panel-head">
+              <div>
+                <p>Senin için öneriler</p>
+                <h3>Bakım ve tekrar rezervasyon</h3>
+              </div>
+              <span class="mini-note">Kişisel akış</span>
+            </div>
+            <div id="customerCare" class="note-list"></div>
+          </article>
+        </section>
+
+        <section class="admin-grid lower-grid">
+          <article class="admin-panel wide-panel" id="history">
+            <div class="panel-head">
+              <div>
+                <p>Geçmiş işlemler</p>
+                <h3>Son ziyaretlerin</h3>
+              </div>
+              <span class="mini-note">İşlem geçmişi</span>
+            </div>
+            <div id="customerHistory" class="customer-grid"></div>
+          </article>
+
+          <article class="admin-panel">
+            <div class="panel-head">
+              <div>
+                <p>Hızlı aksiyonlar</p>
+                <h3>Tek tıkla devam et</h3>
+              </div>
+              <span class="mini-note">Dönüşüm odaklı</span>
+            </div>
+            <div id="customerActions" class="note-list"></div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <script src="./script.js"></script>
+  </body>
+</html>

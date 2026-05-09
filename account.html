@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Luna Studio Client Access</title>
+    <meta
+      name="description"
+      content="Müşteri giriş ekranı. Randevular, işlem geçmişi ve yeniden rezervasyon için demo erişim."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-page="account" class="portal-body">
+    <main class="portal-shell">
+      <section class="portal-card">
+        <div class="portal-copy">
+          <p class="eyebrow">Client Access</p>
+          <h1>Müşteri paneliyle randevu deneyimi daha premium görünür.</h1>
+          <p class="portal-text">
+            Burada müşteri yaklaşan randevusunu, geçmiş işlemlerini ve tek tıkla
+            yeniden rezervasyon seçeneğini görür. Demo amaçlı ayrı giriş akışıyla çalışır.
+          </p>
+          <div class="portal-points">
+            <div>
+              <strong>Tekrar rezervasyon kolaylaşır</strong>
+              <span>Müşteri kendi geçmişini görünce geri dönüş ihtimali artar.</span>
+            </div>
+            <div>
+              <strong>Daha ciddi ürün algısı</strong>
+              <span>Sade bir siteden çok küçük bir üyelik sistemi gibi görünür.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="portal-form-wrap">
+          <form id="accountForm" class="portal-form">
+            <label>
+              <span>E-posta</span>
+              <input name="email" type="email" placeholder="ece@demo.com" required />
+            </label>
+            <label>
+              <span>Şifre</span>
+              <input name="password" type="password" placeholder="••••••••" required />
+            </label>
+            <button class="button button-primary form-submit" type="submit">Giriş Yap</button>
+            <p id="accountFeedback" class="form-feedback" aria-live="polite"></p>
+          </form>
+
+          <div class="credential-box">
+            <p>Demo müşteri hesabı</p>
+            <strong>ece@demo.com</strong>
+            <strong>LunaClient2026</strong>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
