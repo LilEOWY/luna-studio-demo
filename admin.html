@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Luna Studio Admin | Randevu ve Müşteri Takibi</title>
+    <meta
+      name="description"
+      content="Randevu onayı, müşteri kartları ve günlük salon operasyonları için admin panel demosu."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-page="admin" class="admin-body">
+    <div class="admin-shell">
+      <aside class="admin-sidebar">
+        <a class="brand admin-brand" href="./index.html">
+          <span class="brand-mark">LS</span>
+          <span class="brand-copy">
+            <strong>Luna Studio</strong>
+            <small>Operasyon paneli</small>
+          </span>
+        </a>
+        <nav class="admin-nav">
+          <a href="#overview">Genel durum</a>
+          <a href="#pending">Onay bekleyenler</a>
+          <a href="#schedule">Gün planı</a>
+          <a href="#customers">Müşteri kartları</a>
+        </nav>
+        <div class="sidebar-note">
+          <p>Satış cümlesi</p>
+          <strong>
+            “İşletmenizin randevusunu, müşterisini ve gün akışını tek panelde toplayalım.”
+          </strong>
+        </div>
+      </aside>
+
+      <main class="admin-main">
+        <section class="admin-top" id="overview">
+          <div>
+            <p class="eyebrow">Admin panel demo</p>
+            <h1>Randevu kontrolü ve müşteri takibi tek bakışta.</h1>
+          </div>
+          <div class="admin-top-actions">
+            <a class="button button-secondary dark-button" href="./index.html">Siteye dön</a>
+          </div>
+        </section>
+
+        <section class="admin-stats">
+          <article class="stat-card">
+            <span>Bugünkü randevu</span>
+            <strong id="adminTodayBookings">0</strong>
+            <small>onaylı + bekleyen</small>
+          </article>
+          <article class="stat-card">
+            <span>Onay bekleyen</span>
+            <strong id="adminPendingCount">0</strong>
+            <small>hızlı aksiyon gereken</small>
+          </article>
+          <article class="stat-card">
+            <span>Tekrar gelen müşteri</span>
+            <strong id="adminReturningRate">0%</strong>
+            <small>sadakat göstergesi</small>
+          </article>
+          <article class="stat-card">
+            <span>Tahmini günlük ciro</span>
+            <strong id="adminRevenue">0 TL</strong>
+            <small>demo hesaplama</small>
+          </article>
+        </section>
+
+        <section class="admin-grid">
+          <article class="admin-panel" id="pending">
+            <div class="panel-head">
+              <div>
+                <p>Onay bekleyenler</p>
+                <h3>Randevu talepleri</h3>
+              </div>
+              <span class="mini-note">Onayla veya reddet</span>
+            </div>
+            <div id="pendingList" class="admin-list"></div>
+          </article>
+
+          <article class="admin-panel" id="schedule">
+            <div class="panel-head">
+              <div>
+                <p>Gün planı</p>
+                <h3>Saat bazlı akış</h3>
+              </div>
+              <span class="mini-note">Onaylı ağırlıklı</span>
+            </div>
+            <div id="scheduleList" class="admin-list"></div>
+          </article>
+        </section>
+
+        <section class="admin-grid lower-grid">
+          <article class="admin-panel wide-panel" id="customers">
+            <div class="panel-head">
+              <div>
+                <p>Müşteri takibi</p>
+                <h3>Müşteri kartları</h3>
+              </div>
+              <span class="mini-note">Tekrar satış fırsatı</span>
+            </div>
+            <div id="customerList" class="customer-grid"></div>
+          </article>
+
+          <article class="admin-panel notes-panel">
+            <div class="panel-head">
+              <div>
+                <p>Operasyon notları</p>
+                <h3>Günlük kontrol</h3>
+              </div>
+              <span class="mini-note">Demo içerik</span>
+            </div>
+            <div id="activityList" class="note-list"></div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
